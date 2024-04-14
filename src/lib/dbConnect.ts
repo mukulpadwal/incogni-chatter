@@ -14,16 +14,12 @@ export default async function connectToDb(): Promise<void> {
     }
 
     try {
-        const dbConnection = await mongoose.connect(process.env.MONGODB_URI!)
-
-        console.log(dbConnection);
-        console.log(dbConnection.connections);
-        
+        const dbConnection = await mongoose.connect(`${process.env.MONGODB_URI!}/test`);
 
         connection.isConnected = dbConnection.connections[0].readyState;
 
         console.log(`DB connected successfully...`);
-        
+
 
     } catch (error: any) {
         console.log(`Database connection failed : ERROR : ${error.message}`);
