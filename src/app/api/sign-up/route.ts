@@ -11,17 +11,21 @@ export async function POST(request: NextRequest) {
     await connectToDb();
 
     try {
+        // Fetching data from the user-frontend
         const { username, email, password } = await request.json();
 
+        // Generating a random 6 digit otp
         const OTP = Math.floor(100000 + Math.random() * 900000).toString();
 
+        // Let's find if any user already exists with the same email and is verified
         const existingUserWithEmailAndIsVerified = await User.findOne({
             email,
-            isVerified: true
+            isVerified: false
         });
+        
 
         if (existingUserWithEmailAndIsVerified) {
-            // User is already verified
+
             if (existingUserWithEmailAndIsVerified.isVerified) {
                 return NextResponse.json(new ApiResponse(false, "User with same email already exists.", {}),
                     {
@@ -29,7 +33,16 @@ export async function POST(request: NextRequest) {
                     }
                 );
             } else {
+                // Let's update the details of the user and resend the verification email
+                const hashedPassword = await bcrypt.hash(password, 10);
 
+                existingUserWithEmailAndIsVerified.username = username;
+                existingUserWithEmailAndIsVerified.email = email;
+                existingUserWithEmailAndIsVerified.password = hashedPassword;
+                existingUserWithEmailAndIsVerified.verifyOtp = OTP;
+                existingUserWithEmailAndIsVerified.verifyOtpExpiry = new Date(Date.now() + 3600000);
+
+                await existingUserWithEmailAndIsVerified.save();
             }
 
         } else {
@@ -50,15 +63,15 @@ export async function POST(request: NextRequest) {
             await newUser.save();
         }
 
-        // const emailResponse = await sendVerificationEmail(email, username, OTP);
+        const emailResponse = await sendVerificationEmail(email, username, OTP);
 
-        // if (!emailResponse.success) {
-        //     return NextResponse.json(new ApiResponse(false, emailResponse.message, {}),
-        //         {
-        //             status: 500
-        //         }
-        //     );
-        // }
+        if (!emailResponse.success) {
+            return NextResponse.json(new ApiResponse(false, emailResponse.message, {}),
+                {
+                    status: 500
+                }
+            );
+        }
 
         return NextResponse.json(new ApiResponse(true, "User registered successfully. Kindly check your email to verify your account.", {}),
             {
@@ -68,10 +81,10 @@ export async function POST(request: NextRequest) {
 
 
 
-    } catch (error) {
-        console.error(`Error registering user : ERROR : ${error}`)
+    } catch (error: any) {
+        console.error(`Error registering user : ERROR : ${error.message}`)
 
-        return NextResponse.json(new ApiResponse(false, "Error registering user.", {}),
+        return NextResponse.json(new ApiResponse(false, `Error registering user : ERROR : ${error.message}`, {}),
             {
                 status: 500
             }
