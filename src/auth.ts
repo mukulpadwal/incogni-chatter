@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import connectToDb from "./lib/dbConnect";
 import User from "./models/user.model";
+import conf from "./conf/conf";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -93,5 +94,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
 
-  secret: process.env.AUTH_SECRET,
+  secret: conf.authSecret,
 });
