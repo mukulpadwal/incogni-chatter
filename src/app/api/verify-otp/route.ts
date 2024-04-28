@@ -23,8 +23,15 @@ export async function POST(request: NextRequest) {
         const isOtpNotExpired = new Date(user.verifyOtpExpiry) > new Date();
 
         if (isOtpCorrect && isOtpNotExpired) {
-            user.isVerified = true;
-            await user.save();
+            await User.findByIdAndUpdate(user._id, {
+                $set: {
+                    isVerified: true
+                },
+                $unset: {
+                    verifyOtp: "",
+                    verifyOtpExpiry: ""
+                }
+            })
             return NextResponse.json({ success: true, message: `Account verified successfully...` }, { status: 200 });
         } else if (!isOtpNotExpired) {
             return NextResponse.json({ success: false, message: `OTP expired...` }, { status: 400 });
