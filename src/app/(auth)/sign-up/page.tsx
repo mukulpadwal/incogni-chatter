@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 
-const SignInPage = () => {
+const SignUpPage = () => {
   const [username, setUsername] = useState("");
   const [usernameMessage, setUsernameMessage] = useState("");
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
@@ -52,7 +52,7 @@ const SignInPage = () => {
           const response = await axios.get(
             `/api/check-unique-username?username=${username}`
           );
-          
+
           setUsernameMessage(response.data.message);
         } catch (error) {
           const axiosError = error as AxiosError<ApiResponse>;
@@ -71,7 +71,6 @@ const SignInPage = () => {
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     setIsSubmitting(true);
-    console.log(data);
 
     try {
       const response = await axios.post<ApiResponse>("/api/sign-up", data);
@@ -103,7 +102,7 @@ const SignInPage = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
+          <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
             Join Incogni Chatter
           </h1>
           <p className="mb-4">Sign up to start yout anonymous adventure</p>
@@ -130,7 +129,15 @@ const SignInPage = () => {
                   </FormControl>
                   <FormDescription>Please enter your username.</FormDescription>
                   {isCheckingUsername && <Loader2 className="animate-spin" />}
-                  <p className={`text-sm ${usernameMessage === "Username available..." ? "text-green-500" : "text-red-500"}`}>{usernameMessage}</p>
+                  <p
+                    className={`text-sm ${
+                      usernameMessage === "Username available..."
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {usernameMessage}
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -159,7 +166,7 @@ const SignInPage = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -201,4 +208,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default SignUpPage;
