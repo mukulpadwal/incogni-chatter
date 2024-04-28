@@ -1,31 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 
 // This function can be marked `async` if using `await` inside
-export default auth(async function middleware(request: NextRequest) {
-  const token = request.cookies.get("authjs.csrf-token")?.value || "";
-  const url = request.nextUrl;
+export async function middleware(request: NextRequest) {
+  const token = request.cookies.get("authjs.session-token")?.value || "";
+  const path = request.nextUrl.pathname;
 
-
-  if (
-    token &&
-    (url.pathname.startsWith("/sign-in") ||
-      url.pathname.startsWith("/sign-up") ||
-      url.pathname.startsWith("/verify") ||
-      url.pathname.startsWith("/"))
-  ) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // If the user has token it means they should not be allowed to visit public pages
+  if (token) {
+    if (path === "/sign-in" || path === "/" || path === "/sign-up") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
   }
 
-  if (!token && url.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
-
+  // If the user has no token it means they should not be allowed to visit private pages
+  if (!token) {
+    if (path === "/dashboard/:path*") {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
   }
-
-  return NextResponse.next();
-});
+}
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/sign-in", "/sign-up", "/", "/dashboard/:path*", "/verify/:path*"],
+  matcher: ["/sign-in", "/sign-up", "/", "/dashboard/:path*"],
 };

@@ -9,11 +9,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       id: "credentials",
-      name: "Credentials",
+      name: "credentials",
 
       credentials: {
-        username: {},
-        email: { label: "Email", type: "text" },
+        identifier: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
 
@@ -24,10 +23,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const user = await User.findOne({
             $or: [
               {
-                email: String(credentials.email),
+                email: String(credentials.identifier),
               },
               {
-                username: String(credentials.username),
+                username: String(credentials.identifier),
               },
             ],
           });
