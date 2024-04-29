@@ -1,0 +1,17 @@
+[
+    {
+        "title": "Anonymous Message 1",
+        "content": "Privacy is a myth...",
+        "received": "1 minute ago."
+    }, 
+    {
+        "title": "Anonymous Message 2",
+        "content": "Guess karo hum kaun hai.",
+        "received": "10 minutes ago."
+    }, 
+    {
+        "title": "Anonymous Message 3",
+        "content": "Aati kya khandala.",
+        "received": "20 minutes ago."
+    }
+]
